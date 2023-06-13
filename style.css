@@ -22,6 +22,7 @@ textarea {
     border: initial;
     resize: none;
     outline: initial; /* create alternative for focus state */
+    transition: 0.4s;
 }
 
 button {
