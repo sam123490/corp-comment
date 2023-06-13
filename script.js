@@ -15,6 +15,17 @@ textareaEl.addEventListener('input', () => {
 
 
 // -- FORM COMPONENT -- 
+const showVisualIndicator = textCheck => {
+    const className = textCheck === 'valid' ? 'form--valid' : 'form--invalid';
+
+    textareaEl.classList.add(className);
+
+    setTimeout(() => {
+        textareaEl.classList.remove(className);
+    }, 2000);
+};
+
+
 formEl.addEventListener('submit', event => {
     // prevent default browser action
     event.preventDefault();
@@ -24,17 +35,9 @@ formEl.addEventListener('submit', event => {
 
     // validate text (e.g. check if "#" is present, is text long enough?)
     if (text.includes('#') && text.length >= 5) {
-        textareaEl.classList.add('form--valid');
-
-        setTimeout(() => {
-            textareaEl.classList.remove('form--valid');
-        }, 2000);
+        showVisualIndicator('valid');
     } else {
-        textareaEl.classList.add('form--invalid');
-
-        setTimeout(() => {
-            textareaEl.classList.remove('form--invalid');
-        }, 2000);
+        showVisualIndicator('invalid');
 
         // focus textarea
         textareaEl.focus();
@@ -71,8 +74,6 @@ formEl.addEventListener('submit', event => {
 
     // rest our form
     textareaEl.value = '';
-
     submitBtnEl.blur();
-
     counterEl.textContent = MAX_CHARS;
 });
