@@ -6,6 +6,7 @@ const counterEl = document.querySelector('.counter');
 const formEl = document.querySelector('.form');
 const feedbackListEl = document.querySelector('.feedbacks');
 const submitBtnEl = document.querySelector('.submit-btn__text');
+const spinnerEl = document.querySelector('.spinner');
 
 
 // -- COUNTER COMPONENT --
@@ -77,3 +78,37 @@ formEl.addEventListener('submit', event => {
     submitBtnEl.blur();
     counterEl.textContent = MAX_CHARS;
 });
+
+
+// -- FEEDBACK LIST COMPONENT --
+fetch('https://bytegrad.com/course-assets/js/1/api/feedbacks')
+    .then(response => response.json())
+    .then(data => {
+        // remove spinner
+        spinnerEl.remove();
+        // iterate over the feedbakcs attribute (Array of feedback objects) from our response
+        data.feedbacks.forEach(feedbackItem => {
+            // new feedback HTML item for each object in our Array
+            const feedbackItemHTML = `
+                    <li class="feedback">
+                    <button class="upvote">
+                        <i class="fa-solid fa-caret-up upvote__icon"></i>
+                        <span class="upvote__count">${feedbackItem.upvoteCount}</span>
+                    </button>
+                    <section class="feedback__badge">
+                        <p class="feedback__letter">${feedbackItem.badgeLetter}</p>
+                    </section>
+                    <div class="feedback__content">
+                        <p class="feedback__company">${feedbackItem.company}</p>
+                        <p class="feedback__text">${feedbackItem.text}</p>
+                    </div>
+                    <p class="feedback__date">${feedbackItem.daysAgo === 0 ? 'NEW' : `${feedbackItem.daysAgo}d`}</p>
+                </li>
+            `;
+            //insert each item into our template
+            feedbackListEl.insertAdjacentHTML('beforeend', feedbackItemHTML);
+        });
+    })
+    .catch(error => {
+        feedbackListEl.textContent = `Failed to fetch feedback items. Error message: ${error.message}`;
+    });
