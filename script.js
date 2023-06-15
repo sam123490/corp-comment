@@ -1,5 +1,6 @@
 // -- GLOBAL --
 const MAX_CHARS = 150;
+const BASE_API_URL = 'https://bytegrad.com/course-assets/js/1/api';
 
 const textareaEl = document.querySelector('.form__textarea');
 const counterEl = document.querySelector('.counter');
@@ -49,7 +50,7 @@ const showVisualIndicator = textCheck => {
 };
 
 
-formEl.addEventListener('submit', event => {
+const submitHandler = event => {
     // prevent default browser action
     event.preventDefault();
 
@@ -74,7 +75,7 @@ formEl.addEventListener('submit', event => {
     const upvoteCount = 0;
     const daysAgo = 0;
 
-    // create feedback item object
+    // render feedback item in list
     const feedbackItem = {
         upvoteCount: upvoteCount,
         company: company,
@@ -82,19 +83,35 @@ formEl.addEventListener('submit', event => {
         daysAgo: daysAgo,
         text: text
     };
-
-    // render feedback item
     renderFeedbackItem(feedbackItem);
 
-    // rest our form
+    // send feedback item to server
+    fetch(`${BASE_API_URL}/feedbacks`, {
+        method: 'POST',
+        body: JSON.stringify(feedbackItem),
+        headers: {
+            Acccept: 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (!response.ok) {
+            console.log('Something went wrong');
+            return;
+        }
+
+        console.log('Successfully submitted');
+    }).catch(error => console.log(`Failed to submit data to server. Error message: ${error.message}`));
+
+    // reset our form
     textareaEl.value = '';
     submitBtnEl.blur();
     counterEl.textContent = MAX_CHARS;
-});
+};
+formEl.addEventListener('submit', submitHandler);
 
 
 // -- FEEDBACK LIST COMPONENT --
-fetch('https://bytegrad.com/course-assets/js/1/api/feedbacks')
+fetch(`${BASE_API_URL}/feedbacks`)
     .then(response => response.json())
     .then(data => {
         // remove spinner
@@ -104,4 +121,4 @@ fetch('https://bytegrad.com/course-assets/js/1/api/feedbacks')
     })
     .catch(error => {
         feedbackListEl.textContent = `Failed to fetch feedback items. Error message: ${error.message}`;
-    }); 
+    });
