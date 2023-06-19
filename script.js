@@ -51,7 +51,7 @@ const showVisualIndicator = textCheck => {
 };
 
 
-const submitHandler = event => {
+const submitHandler = async event => {
     // prevent default browser action
     event.preventDefault();
 
@@ -87,21 +87,26 @@ const submitHandler = event => {
     renderFeedbackItem(feedbackItem);
 
     // send feedback item to server
-    fetch(`${BASE_API_URL}/feedbacks`, {
-        method: 'POST',
-        body: JSON.stringify(feedbackItem),
-        headers: {
-            Acccept: 'application/json',
-            'Content-Type': 'application/json'
-        }
-    }).then(response => {
-        if (!response.ok) {
-            console.log('Something went wrong');
+    try {
+        const result = await fetch(`${BASE_API_URL}/feedbacks`, {
+            method: 'POST',
+            body: JSON.stringify(feedbackItem),
+            headers: {
+                Acccept: 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await result.json();
+
+        if (!result.ok) {
+            console.log(data.description);
             return;
         }
 
-        console.log('Successfully submitted');
-    }).catch(error => console.log(`Failed to submit data to server. Error message: ${error.message}`));
+        console.log('Successfully submitted', data);
+    } catch (error) {
+        console.log(`Failed to submit data to server. Error message: ${error.message}`);
+    }
 
     // reset our form
     textareaEl.value = '';
